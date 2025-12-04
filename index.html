@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ember Lane Bistro – Order Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-hero: #ffd9d2;
+      --bg-body: #f5f5f7;
+      --bg-card: #ffffff;
+      --bg-chip: #f5f5f5;
+      --border-subtle: #e5e5e5;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --accent: #16a34a;
+      --accent-soft: #dcfce7;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 8px 28px rgba(15, 23, 42, 0.12);
+      --transition-fast: 0.15s ease-out;
+      --transition-med: 0.25s ease-out;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background: var(--bg-body);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      height: 80px;
+    }
+
+    .topbar-inner {
+      height: 100%;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .logo-img {
+      height: 150px;
+      width: auto;
+    }
+
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #f4f4f5;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .mode-toggle button {
+      border: none;
+      background: transparent;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: #4b5563;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .mode-toggle button.active {
+      background: #ffffff;
+      color: #111827;
+      box-shadow: 0 0 0 1px #e5e7eb;
+    }
+
+    .auth-link {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .auth-link:hover {
+      background: #f3f4f6;
+    }
+
+    .auth-primary {
+      border-color: #111827;
+    }
+
+    /* HERO (UBER-ISH STYLE, SAME IMAGE) */
+    .hero {
+      background:
+        linear-gradient(to bottom, rgba(255, 217, 210, 0.88), rgba(255, 217, 210, 0.9)),
+        url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80")
+        center/cover no-repeat;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-overlay {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .hero-inner {
+      padding: 3.5rem 0 4.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.3rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 4.2vw, 2.7rem);
+      font-weight: 700;
+    }
+
+    .hero-sub {
+      max-width: 32rem;
+      font-size: 0.95rem;
+      color: #374151;
+    }
+
+    .hero-note {
+      font-size: 0.8rem;
+      color: #4b5563;
+      margin-top: 0.4rem;
+    }
+
+    /* HERO SEARCH BAR – UBER-STYLE */
+    .hero-search {
+      margin-top: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: min(520px, 100%);
+    }
+
+    .hero-search-input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 0.45rem 0.85rem;
+      height: 48px; /* consistent bar height */
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    .hero-search-icon {
+      margin-right: 0.55rem;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .hero-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 0.87rem;
+      padding: 0;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .hero-search-input::placeholder {
+      color: #6b7280;
+    }
+
+    .hero-search-btn {
+      height: 48px;
+      padding: 0 1.3rem;
+      border-radius: 12px;
+      border: none;
+      background: #000000;
+      color: #ffffff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      transition: background 0.15s ease-out, transform 0.15s ease-out;
+    }
+
+    .hero-search-btn:hover {
+      background: #111111;
+      transform: translateY(-1px);
+    }
+
+    /* CONTENT WRAPPER UNDER HERO */
+    .content-shell {
+      background: #ffffff;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      margin-top: -24px;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+      padding-bottom: 3rem;
+    }
+
+    .mode-shell {
+      padding-top: 2.4rem;
+    }
+
+    .mode-shell.hidden {
+      display: none;
+    }
+
+    .intro {
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .intro h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 48rem;
+      line-height: 1.5;
+    }
+
+    .intro-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    .pill-soft {
+      background: #f3f4f6;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .rating-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      background: #fefce8;
+      font-size: 0.8rem;
+    }
+
+    .rating-pill span:first-child {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #facc15;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    .section-heading {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.9rem;
+    }
+
+    /* CATEGORY CHIPS */
+    .categories-section {
+      padding-top: 1.6rem;
+      padding-bottom: 1.6rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .categories-row {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+    }
+
+    .category-chip {
+      min-width: 150px;
+      background: var(--bg-chip);
+      border-radius: var(--radius-lg);
+      padding: 0.7rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .category-chip:hover {
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+      border-color: #e5e7eb;
+    }
+
+    .category-chip.active {
+      background: #ffffff;
+      border-color: #111827;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+    }
+
+    .category-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .category-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .category-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .category-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    /* DISHES LAYOUT */
+    .dishes-section {
+      padding-top: 1.6rem;
+    }
+
+    .dishes-layout {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .dishes-main {
+      flex: 1.7;
+    }
+
+    .dishes-sidebar {
+      flex: 1;
+      max-width: 290px;
+      position: sticky;
+      top: 90px;
+      align-self: flex-start;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sidebar-card {
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 0.9rem 0.9rem 1rem;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .sidebar-card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: #111827;
+    }
+
+    .sidebar-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .sidebar-gallery img {
+      border-radius: 10px;
+      height: 70px;
+      object-fit: cover;
+    }
+
+    .sidebar-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+
+    .sidebar-tag {
+      font-size: 0.73rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+
+    .sidebar-hours-row {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .sidebar-hours-row span {
+      display: block;
+    }
+
+    .dishes-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.9rem;
+    }
+
+    .dish-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid #e5e7eb;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) 220px;
+      gap: 0.9rem;
+      padding: 0.75rem;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+      transition: box-shadow var(--transition-med), transform var(--transition-med), border-color var(--transition-med);
+    }
+
+    .dish-card:hover {
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+      transform: translateY(-1px);
+      border-color: #d1d5db;
+    }
+
+    .dish-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.4rem;
+    }
+
+    .dish-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .dish-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .dish-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+
+    .dish-tag {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .dish-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+    }
+
+    .dish-price {
+      font-weight: 600;
+    }
+
+    .dish-rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 0.78rem;
+    }
+
+    .dish-rating span:first-child {
+      font-size: 0.8rem;
+    }
+
+    .dish-image-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      min-height: 120px;
+      background: #f3f4f6;
+    }
+
+    .dish-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-med);
+    }
+
+    .dish-card:hover .dish-image-wrap img {
+      transform: scale(1.05);
+    }
+
+    .dish-flag {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      background: rgba(17, 24, 39, 0.7);
+      color: #f9fafb;
+      backdrop-filter: blur(4px);
+    }
+
+    /* PICKUP INFO */
+    .pickup-info {
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 1.6rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .pickup-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    .pickup-badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    /* BOTTOM STRIP */
+    .bottom-strip {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #92400e;
+      color: #fef3c7;
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      z-index: 45;
+    }
+
+    .bottom-strip button {
+      background: #fef3c7;
+      border: none;
+      border-radius: 999px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .bottom-strip__close {
+      position: absolute;
+      right: 1.3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #000000;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* ADDRESS BANNER */
+    .address-banner {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 3.1rem;
+      background: var(--accent-soft);
+      color: #166534;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      box-shadow: 0 10px 30px rgba(22, 163, 74, 0.25);
+      display: none;
+      align-items: center;
+      gap: 0.45rem;
+      z-index: 46;
+    }
+
+    .address-banner span.icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #22c55e;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecfdf5;
+      font-size: 0.8rem;
+    }
+
+    .address-banner.show {
+      display: inline-flex;
+    }
+
+    /* FOOTER */
+    footer {
+      margin-top: 2rem;
+      padding-bottom: 3.5rem;
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    footer .container {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    footer a {
+      cursor: pointer;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* AUTH MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.45);
+      width: min(380px, 100%);
+      padding: 1.5rem 1.4rem 1.6rem;
+      position: relative;
+      animation: modalIn 0.18s ease-out;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 0.9rem;
+      top: 0.9rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #6b7280;
+    }
+
+    .modal h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .modal p {
+      font-size: 0.82rem;
+      color: #6b7280;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .modal-label {
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    .modal-input {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .modal-input:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 1px #111827;
+    }
+
+    .modal-btn {
+      margin-top: 0.4rem;
+      border-radius: 999px;
+      border: none;
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: #111827;
+      color: #f9fafb;
+      cursor: pointer;
+      transition: background var(--transition-fast), opacity var(--transition-fast);
+    }
+
+    .modal-btn:hover {
+      background: #000000;
+      opacity: 0.96;
+    }
+
+    .modal-footer-text {
+      margin-top: 0.7rem;
+      font-size: 0.78rem;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    .modal-footer-text button {
+      border: none;
+      background: none;
+      padding: 0;
+      margin-left: 0.2rem;
+      font-size: 0.78rem;
+      color: #111827;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* SOCIAL FOOTER */
+    .social-footer {
+      width: 100%;
+      padding: 1.8rem 0 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      margin-top: 2rem;
+    }
+
+    .social-footer .icons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .social-footer .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #6b7280;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .social-footer .social-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .social-footer .social-icon path {
+      fill: currentColor;
+    }
+
+    .social-footer .instagram:hover {
+      background: #e1306c;
+      border-color: #e1306c;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .social-footer .facebook:hover {
+      background: #1877f2;
+      border-color: #1877f2;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .social-footer .youtube:hover {
+      background: #ff0000;
+      border-color: #ff0000;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .social-footer .tiktok:hover {
+      background: #000000;
+      border-color: #000000;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .social-footer .twitter:hover {
+      background: #1d9bf0;
+      border-color: #1d9bf0;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .social-footer .copy {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .dish-card {
+        grid-template-columns: minmax(0, 1fr) 160px;
+      }
+
+      .dishes-layout {
+        flex-direction: column;
+      }
+
+      .dishes-sidebar {
+        position: static;
+        max-width: none;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        padding-inline: 1rem;
+      }
+
+      .logo {
+        font-size: 0.9rem;
+      }
+
+      .hero-inner {
+        padding: 3rem 1.5rem 3.4rem;
+      }
+
+      .dish-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .dish-image-wrap {
+        order: -1;
+        height: 170px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .hero-search {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+
+      .hero-search-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <div class="logo">
+          <img src="EmberLaneBistro.png" alt="Ember Lane Bistro logo" class="logo-img">
+        </div>
+      </div>
+
+      <div class="mode-toggle" aria-label="Order mode">
+        <button class="active" data-mode="delivery">Delivery</button>
+        <button data-mode="pickup">Pickup</button>
+      </div>
+
+      <div class="topbar-right">
+        <button class="auth-link" data-open-modal="login">Log in</button>
+        <button class="auth-link auth-primary" data-open-modal="signup">Sign up</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-overlay">
+      <div class="container hero-inner">
+        <h2 class="hero-title" id="heroTitle">Food delivery from Ember Lane Bistro</h2>
+        <p class="hero-sub" id="heroSub">
+          Wood-fired plates, bright seasonal sides and desserts sent straight from our kitchen to your door.
+        </p>
+
+        <div class="hero-search">
+          <div class="hero-search-input-wrap">
+            <div class="hero-search-icon">📍</div>
+            <input
+              id="addressInput"
+              class="hero-search-input"
+              placeholder="Enter delivery or pickup address"
+              autocomplete="off"
+            />
+          </div>
+          <button class="hero-search-btn" id="findFoodBtn">Find food</button>
+        </div>
+
+        <p class="hero-note" id="heroNote">
+          Delivering nightly from 5:00 pm – 10:30 pm · Pickup from the host stand in under 10 minutes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SHELL -->
+  <div class="content-shell">
+    <!-- DELIVERY MODE -->
+    <div class="mode-shell" id="deliveryShell">
+      <div class="container">
+        <!-- INTRO -->
+        <section class="intro" id="menu">
+          <h1>Ember Lane Bistro</h1>
+          <p>
+            Craving flame-kissed steaks, citrusy crudo or ember-roasted vegetables? Ember Lane brings a focused
+            menu of wood-fired dishes, shareable plates and bright desserts. Order in and get the full restaurant
+            experience at home—warm, bold and built for comfort.
+          </p>
+          <div class="intro-meta">
+            <span class="rating-pill">
+              <span>4.8</span>
+              <span>200+ ratings</span>
+            </span>
+            <span>• Contemporary American · Seasonal · Wood-fired</span>
+            <span class="pill-soft">30–45 min · $$</span>
+          </div>
+        </section>
+
+        <!-- CATEGORIES -->
+        <section class="categories-section">
+          <h2 class="section-heading">Explore the menu by category</h2>
+          <div class="categories-row" id="categoryRow">
+            <button class="category-chip active" data-category="all">
+              <div class="category-text">
+                <span class="category-name">All dishes</span>
+                <span class="category-sub">Everything we’re serving</span>
+              </div>
+              <div class="category-icon">🍽️</div>
+            </button>
+
+            <button class="category-chip" data-category="starters">
+              <div class="category-text">
+                <span class="category-name">Starters</span>
+                <span class="category-sub">Begin with a small plate</span>
+              </div>
+              <div class="category-icon">🥗</div>
+            </button>
+
+            <button class="category-chip" data-category="mains">
+              <div class="category-text">
+                <span class="category-name">Mains</span>
+                <span class="category-sub">Comforting, hearty favorites</span>
+              </div>
+              <div class="category-icon">🍝</div>
+            </button>
+
+            <button class="category-chip" data-category="sides">
+              <div class="category-text">
+                <span class="category-name">Sides</span>
+                <span class="category-sub">For the table</span>
+              </div>
+              <div class="category-icon">🥔</div>
+            </button>
+
+            <button class="category-chip" data-category="desserts">
+              <div class="category-text">
+                <span class="category-name">Desserts</span>
+                <span class="category-sub">Sweet endings</span>
+              </div>
+              <div class="category-icon">🍮</div>
+            </button>
+
+            <button class="category-chip" data-category="drinks">
+              <div class="category-text">
+                <span class="category-name">Drinks</span>
+                <span class="category-sub">From spritz to zero-proof</span>
+              </div>
+              <div class="category-icon">🥂</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- DISHES + SIDEBAR -->
+        <section class="dishes-section">
+          <div class="dishes-layout">
+            <!-- MAIN LIST -->
+            <div class="dishes-main">
+              <h2 class="section-heading">Popular tonight</h2>
+              <div class="dishes-grid" id="dishesGrid">
+                <!-- Delivery dish cards -->
+                <article class="dish-card" data-category="starters">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Citrus-Cured Salmon Crudo</h3>
+                      <p class="dish-meta">
+                        Yuzu kosho, shaved fennel, pickled radish, smoked olive oil and crispy capers.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Bright</span>
+                        <span class="dish-tag">Gluten friendly</span>
+                        <span class="dish-tag">Seafood</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$18.50</span>
+                      <span class="dish-rating"><span>★</span> 4.9 · 80+ ordered</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80" alt="Salmon crudo" />
+                    <span class="dish-flag">Best seller</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="starters">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Charcoal-Grilled Prawns</h3>
+                      <p class="dish-meta">
+                        Chili-lime butter, garlic, charred lemon and grilled sourdough for dipping.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Seafood</span>
+                        <span class="dish-tag">Shareable</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$19.00</span>
+                      <span class="dish-rating"><span>★</span> 4.7 · New</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80" alt="Grilled prawns" />
+                    <span class="dish-flag">New</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="mains">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Wood-Fired Ribeye for One</h3>
+                      <p class="dish-meta">
+                        12oz dry-aged ribeye, charred scallion butter, crispy potatoes and ember jus.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Steak</span>
+                        <span class="dish-tag">Wood-fired</span>
+                        <span class="dish-tag">Gluten friendly</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$39.00</span>
+                      <span class="dish-rating"><span>★</span> 4.8 · Chef’s pick</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1553163147-622ab57be1c7?auto=format&fit=crop&w=900&q=80" alt="Ribeye steak" />
+                    <span class="dish-flag">Wood-fired</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="mains">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Wild Mushroom Tagliatelle</h3>
+                      <p class="dish-meta">
+                        Handmade pasta with roasted mushrooms, brown butter, thyme and aged parmesan.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Vegetarian</span>
+                        <span class="dish-tag">Comfort</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$24.50</span>
+                      <span class="dish-rating"><span>★</span> 4.8 · 120+ ordered</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=900&q=80" alt="Mushroom pasta" />
+                    <span class="dish-flag">Vegetarian</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="sides">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Ember-Roasted Cauliflower</h3>
+                      <p class="dish-meta">
+                        Harissa glaze, tahini, pomegranate, pistachio and green herb oil.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Vegan</span>
+                        <span class="dish-tag">Shareable</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$13.00</span>
+                      <span class="dish-rating"><span>★</span> 4.7 · Crowd favorite</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=900&q=80" alt="Cauliflower" />
+                    <span class="dish-flag">Vegan</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="sides">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Truffle Herb Fries</h3>
+                      <p class="dish-meta">
+                        Shoestring fries, truffle oil, parmesan, parsley and roasted garlic aioli.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Side</span>
+                        <span class="dish-tag">Addictive</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$9.50</span>
+                      <span class="dish-rating"><span>★</span> 4.9 · Most shared</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80" alt="Truffle fries" />
+                    <span class="dish-flag">Side</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="desserts">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Smoked Vanilla Crème Brûlée</h3>
+                      <p class="dish-meta">
+                        Vanilla bean custard with a whisper of smoke, crackly sugar top and berries.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Gluten friendly</span>
+                        <span class="dish-tag">Rich</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$11.00</span>
+                      <span class="dish-rating"><span>★</span> 4.9 · Sweet ending</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?auto=format&fit=crop&w=900&q=80" alt="Crème brûlée" />
+                    <span class="dish-flag">Dessert</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="desserts">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Sticky Toffee Pudding</h3>
+                      <p class="dish-meta">
+                        Warm date cake, toffee sauce and vanilla ice cream, packed for travel.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Warm</span>
+                        <span class="dish-tag">Comfort</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$12.00</span>
+                      <span class="dish-rating"><span>★</span> 4.8 · Cozy choice</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1475855581690-80accde3ae2b?auto=format&fit=crop&w=900&q=80" alt="Sticky toffee pudding" />
+                    <span class="dish-flag">Warm</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="drinks">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Charred Citrus Old Fashioned</h3>
+                      <p class="dish-meta">
+                        House bourbon, charred orange, demerara and bitters. Bottled for delivery.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Cocktail</span>
+                        <span class="dish-tag">Smoky</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$15.00</span>
+                      <span class="dish-rating"><span>★</span> 4.8 · Bar favorite</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=900&q=80" alt="Old fashioned cocktail" />
+                    <span class="dish-flag">21+</span>
+                  </div>
+                </article>
+
+                <article class="dish-card" data-category="drinks">
+                  <div class="dish-main">
+                    <div>
+                      <h3 class="dish-title">Zero-Proof Ember Spritz</h3>
+                      <p class="dish-meta">
+                        Smoked tea, citrus cordial, tonic and rosemary. All flavor, no alcohol.
+                      </p>
+                      <div class="dish-tags">
+                        <span class="dish-tag">Zero-proof</span>
+                        <span class="dish-tag">Refreshing</span>
+                      </div>
+                    </div>
+                    <div class="dish-footer">
+                      <span class="dish-price">$9.50</span>
+                      <span class="dish-rating"><span>★</span> 4.7 · NA option</span>
+                    </div>
+                  </div>
+                  <div class="dish-image-wrap">
+                    <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=900&q=80" alt="Sparkling drink" />
+                    <span class="dish-flag">Zero-proof</span>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <aside class="dishes-sidebar">
+              <div class="sidebar-card">
+                <h3>Tonight at Ember Lane</h3>
+                <p>Fresh off the fire and traveling well. These are the plates our regulars can’t stop ordering.</p>
+                <div class="sidebar-gallery">
+                  <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=900&q=80" alt="Steak" />
+                  <img
+                    src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80"
+                    alt="Pasta" />
+                  <img
+                    src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80"
+                    alt="Pasta" />
+                  <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=900&q=80" alt="Dessert" />
+                </div>
+                <div class="sidebar-tag-row">
+                  <span class="sidebar-tag">Wood-fired kitchen</span>
+                  <span class="sidebar-tag">Seasonal menu</span>
+                  <span class="sidebar-tag">House cocktails</span>
+                </div>
+              </div>
+
+              <div class="sidebar-card">
+                <h3>Hours & info</h3>
+                <div class="sidebar-hours-row">
+                  <span>Tue–Thu · 5:00 pm – 10:00 pm</span>
+                  <span>Fri–Sun · 5:00 pm – 11:00 pm</span>
+                  <span style="margin-top:0.3rem;">Closed on Mondays</span>
+                </div>
+                <p style="margin-top:0.6rem;">
+                  118 Ember Lane, Downtown<br />
+                  Avg. delivery: 30–45 min · $$–$$$
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- FOOTER (shared) -->
+        <footer>
+          <div class="container">
+            <span>© <span id="year"></span> Ember Lane Bistro.</span>
+            <span><a onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top ↑</a></span>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- PICKUP MODE -->
+    <div class="mode-shell hidden" id="pickupShell">
+      <div class="container">
+        <section class="pickup-info">
+          <h1>Pickup at Ember Lane Bistro</h1>
+          <p>
+            Order ahead and skip the line. We’ll have your bags waiting at the host stand, still warm from the fire.
+            Most pickup orders are ready in under 10 minutes.
+          </p>
+          <div class="pickup-badges">
+            <span class="pickup-badge">Dedicated pickup shelf</span>
+            <span class="pickup-badge">Parking out front</span>
+            <span class="pickup-badge">Contactless hand-off</span>
+          </div>
+        </section>
+
+        <section class="dishes-section">
+          <h2 class="section-heading">Pickup-friendly favorites</h2>
+          <div class="dishes-grid">
+            <article class="dish-card">
+              <div class="dish-main">
+                <div>
+                  <h3 class="dish-title">Ember Lane Lunch Bowl</h3>
+                  <p class="dish-meta">
+                    Charcoal grilled chicken, roasted vegetables, grains, soft herbs and lemon tahini.
+                  </p>
+                  <div class="dish-tags">
+                    <span class="dish-tag">Perfect for to-go</span>
+                    <span class="dish-tag">High protein</span>
+                  </div>
+                </div>
+                <div class="dish-footer">
+                  <span class="dish-price">$17.00</span>
+                  <span class="dish-rating"><span>★</span> 4.9 · Ready in 8 min</span>
+                </div>
+              </div>
+              <div class="dish-image-wrap">
+                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80" alt="Lunch bowl" />
+                <span class="dish-flag">Pickup special</span>
+              </div>
+            </article>
+
+            <article class="dish-card">
+              <div class="dish-main">
+                <div>
+                  <h3 class="dish-title">Crispy Chicken Sandwich</h3>
+                  <p class="dish-meta">
+                    Buttermilk fried chicken, chili honey, slaw and pickles on toasted brioche.
+                  </p>
+                  <div class="dish-tags">
+                    <span class="dish-tag">Handheld</span>
+                    <span class="dish-tag">Spicy option</span>
+                  </div>
+                </div>
+                <div class="dish-footer">
+                  <span class="dish-price">$15.00</span>
+                  <span class="dish-rating"><span>★</span> 4.8 · Staff favorite</span>
+                </div>
+              </div>
+              <div class="dish-image-wrap">
+                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80" alt="Chicken sandwich" />
+                <span class="dish-flag">Crispy</span>
+              </div>
+            </article>
+
+            <article class="dish-card">
+              <div class="dish-main">
+                <div>
+                  <h3 class="dish-title">Charred Veggie Salad</h3>
+                  <p class="dish-meta">
+                    Mixed greens, charred seasonal vegetables, seeds, feta and citrus vinaigrette.
+                  </p>
+                  <div class="dish-tags">
+                    <span class="dish-tag">Light</span>
+                    <span class="dish-tag">Vegetarian</span>
+                  </div>
+                </div>
+                <div class="dish-footer">
+                  <span class="dish-price">$14.50</span>
+                  <span class="dish-rating"><span>★</span> 4.7 · Lunch go-to</span>
+                </div>
+              </div>
+              <div class="dish-image-wrap">
+                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80" alt="Veggie salad" />
+                <span class="dish-flag">Fresh</span>
+              </div>
+            </article>
+
+            <article class="dish-card">
+              <div class="dish-main">
+                <div>
+                  <h3 class="dish-title">Ember Lane Burger</h3>
+                  <p class="dish-meta">
+                    Griddled patty, cheddar, caramelized onions, house sauce, crisp lettuce and fries.
+                  </p>
+                  <div class="dish-tags">
+                    <span class="dish-tag">Classic</span>
+                    <span class="dish-tag">Add bacon</span>
+                  </div>
+                </div>
+                <div class="dish-footer">
+                  <span class="dish-price">$16.50</span>
+                  <span class="dish-rating"><span>★</span> 4.8 · Pickup favorite</span>
+                </div>
+              </div>
+              <div class="dish-image-wrap">
+                <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80" alt="Burger" />
+                <span class="dish-flag">To-go</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="dishes-section">
+          <h2 class="section-heading">Pickup details</h2>
+          <p style="font-size:0.9rem;color:#6b7280;max-width:36rem;">
+            When you arrive, head inside and look for the green Ember Lane pickup shelf by the host stand. Your bags 
+            will be labeled with your name and order number. If you’d like curbside hand-off, call us at 
+            (555) 013-9910 and we’ll bring it out.
+          </p>
+        </section>
+
+        <footer>
+          <div class="container">
+            <span>© <span id="yearPickup"></span> Ember Lane Bistro.</span>
+            <span><a onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top ↑</a></span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM STRIP -->
+  <div class="bottom-strip" id="promoStrip">
+    <span>🎁 Free dessert on your first Ember Lane delivery or pickup order this week.</span>
+    <button type="button" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">View menu</button>
+    <button class="bottom-strip__close" aria-label="Close banner" onclick="document.getElementById('promoStrip').style.display='none'">✖</button>
+  </div>
+
+  <!-- ADDRESS BANNER -->
+  <div class="address-banner" id="addressBanner">
+    <span class="icon">✓</span>
+    <span id="addressText">Delivering to …</span>
+  </div>
+
+  <!-- AUTH MODALS -->
+  <div class="modal-backdrop" id="authModalBackdrop">
+    <div class="modal" id="authModal">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+      <h2 id="modalTitle">Log in to Ember Lane</h2>
+      <p id="modalSubtitle">Save your addresses, reorder favorites and track your orders in real time.</p>
+
+      <form class="modal-form" onsubmit="event.preventDefault();">
+        <div>
+          <label class="modal-label" for="modalEmail">Email</label>
+          <input id="modalEmail" type="email" class="modal-input" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label class="modal-label" for="modalPassword">Password</label>
+          <input id="modalPassword" type="password" class="modal-input" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="modal-btn" id="modalPrimaryBtn">Log in</button>
+      </form>
+
+      <div class="modal-footer-text" id="modalFooterText">
+        First time here?
+        <button type="button" id="modalSwitchBtn">Create an account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCIALS AT BOTTOM -->
+  <div class="social-footer">
+    <div class="icons">
+      <!-- Instagram -->
+      <a href="https://www.instagram.com" target="_blank" class="social-icon instagram" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 5.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5zm4.25-1.75a1 1 0 1 0 1 1 1 1 0 0 0-1-1z"/></svg>
+      </a>
+
+      <!-- Facebook -->
+      <a href="https://www.facebook.com" target="_blank" class="social-icon facebook" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M13 3h3v3h-3v3h3v3h-3v7h-3v-7H8v-3h2V9a3 3 0 0 1 3-3z"/></svg>
+      </a>
+
+      <!-- YouTube -->
+      <a href="https://www.youtube.com" target="_blank" class="social-icon youtube" aria-label="YouTube">
+        <svg viewBox="0 0 24 24"><path d="M22 12s0-3-.4-4.5a3 3 0 0 0-2.1-2.1C17 5 12 5 12 5s-5 0-7.5.4a3 3 0 0 0-2.1 2.1C2 9 2 12 2 12s0 3 .4 4.5a3 3 0 0 0 2.1 2.1C7 19 12 19 12 19s5 0 7.5-.4a3 3 0 0 0 2.1-2.1C22 15 22 12 22 12zM10 9l5 3-5 3z"/></svg>
+      </a>
+
+      <!-- TikTok -->
+       <a href="https://www.tiktok.com" class="social-icon tiktok" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M16 4.5a4 4 0 0 0 3 3.9v3a7.1 7.1 0 0 1-3.2-.8v4.4A4.5 4.5 0 1 1 11 10v3a1.5 1.5 0 1 0 1.5 1.5V3.5h3.5z"/>
+      </svg>
+    </a>
+
+      <!-- Twitter -->
+      <a href="https://www.twitter.com" target="_blank" class="social-icon twitter" aria-label="Twitter">
+        <svg viewBox="0 0 24 24"><path d="M8 5h3l2 3 3-3h3l-4 5 5 9h-3l-3-5-3 5H8l4-6z"/></svg>
+      </a>
+    </div>
+
+    <div class="copy">
+      © 2024 Ember Lane Bistro — All rights reserved.
+    </div>
+  </div>
+
+  <script>
+    // dynamic years
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("yearPickup").textContent = new Date().getFullYear();
+
+    // hero address + banner
+    const findFoodBtn = document.getElementById("findFoodBtn");
+    const addressInput = document.getElementById("addressInput");
+    const addressBanner = document.getElementById("addressBanner");
+    const addressText = document.getElementById("addressText");
+
+    findFoodBtn.addEventListener("click", () => {
+      const value = addressInput.value.trim();
+      if (value) {
+        addressText.textContent = "Delivering or ready for pickup at " + value;
+      } else {
+        addressText.textContent = "Address saved. We’ll show times for your area.";
+      }
+
+      addressBanner.classList.add("show");
+
+      setTimeout(() => {
+        addressBanner.classList.remove("show");
+      }, 4000);
+
+      const menuSection = document.getElementById("menu");
+      if (menuSection) {
+        const offset = 70;
+        const y = menuSection.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    });
+
+    // category filtering in delivery mode
+    const categoryChips = document.querySelectorAll(".category-chip");
+    const dishes = document.querySelectorAll("#dishesGrid .dish-card");
+
+    categoryChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const category = chip.getAttribute("data-category");
+
+        categoryChips.forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+
+        dishes.forEach((dish) => {
+          const dishCategory = dish.getAttribute("data-category");
+          if (category === "all" || category === dishCategory) {
+            dish.style.display = "";
+          } else {
+            dish.style.display = "none";
+          }
+        });
+      });
+    });
+
+    // delivery vs pickup toggle
+    const modeButtons = document.querySelectorAll(".mode-toggle button");
+    const deliveryShell = document.getElementById("deliveryShell");
+    const pickupShell = document.getElementById("pickupShell");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSub = document.getElementById("heroSub");
+    const heroNote = document.getElementById("heroNote");
+
+    modeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const mode = btn.getAttribute("data-mode");
+        modeButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (mode === "pickup") {
+          deliveryShell.classList.add("hidden");
+          pickupShell.classList.remove("hidden");
+          heroTitle.textContent = "Pickup from Ember Lane Bistro";
+          heroSub.textContent =
+            "Order ahead, skip the line and grab your bags from our dedicated pickup shelf by the host stand.";
+          heroNote.textContent = "Pickup ready in 8–12 minutes · Parking and curbside hand-off available.";
+        } else {
+          pickupShell.classList.add("hidden");
+          deliveryShell.classList.remove("hidden");
+          heroTitle.textContent = "Food delivery from Ember Lane Bistro";
+          heroSub.textContent =
+            "Wood-fired plates, bright seasonal sides and desserts sent straight from our kitchen to your door.";
+          heroNote.textContent = "Delivering nightly from 5:00 pm – 10:30 pm · Pickup also available.";
+        }
+      });
+    });
+
+    // auth modals
+    const modalBackdrop = document.getElementById("authModalBackdrop");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSubtitle = document.getElementById("modalSubtitle");
+    const modalPrimaryBtn = document.getElementById("modalPrimaryBtn");
+    const modalFooterText = document.getElementById("modalFooterText");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+
+    let currentAuthMode = "login";
+
+    function openModal(mode) {
+      currentAuthMode = mode;
+      if (mode === "login") {
+        modalTitle.textContent = "Log in to Ember Lane";
+        modalSubtitle.textContent =
+          "Save your addresses, reorder favorites and track your orders in real time.";
+        modalPrimaryBtn.textContent = "Log in";
+        modalFooterText.innerHTML =
+          'First time here?<button type="button" id="modalSwitchBtn">Create an account</button>';
+      } else {
+        modalTitle.textContent = "Create your Ember Lane account";
+        modalSubtitle.textContent =
+          "Check out faster next time and keep all your favorite orders in one place.";
+        modalPrimaryBtn.textContent = "Sign up";
+        modalFooterText.innerHTML =
+          'Already have an account?<button type="button" id="modalSwitchBtn">Log in</button>';
+      }
+      modalBackdrop.classList.add("show");
+
+      document.getElementById("modalSwitchBtn").onclick = () =>
+        openModal(currentAuthMode === "login" ? "signup" : "login");
+    }
+
+    document.querySelectorAll("[data-open-modal]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const mode = btn.getAttribute("data-open-modal");
+        openModal(mode);
+      });
+    });
+
+    modalCloseBtn.addEventListener("click", () => {
+      modalBackdrop.classList.remove("show");
+    });
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) {
+        modalBackdrop.classList.remove("show");
+      }
+    });
+  </script>
+</body>
+</html>
